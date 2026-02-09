@@ -10,9 +10,11 @@
       href="https://fonts.googleapis.com/css2?family=Lora:wght@400;600&family=Work+Sans:wght@400;600&display=swap"
       rel="stylesheet"
     />
+    <meta name="description" content="AI Monthly Digest for January 2026: Top AI news, trends, and insights." />
     <link rel="stylesheet" href="../../styles.css" />
   </head>
   <body>
+    <a href="#main" class="deck__skip">Skip to slides</a>
     <div class="deck">
       <header class="deck__nav">
         <div>
@@ -25,7 +27,9 @@
         </div>
       </header>
 
-      <main class="slides" data-slide-count="10">
+      <div class="deck__live" aria-live="polite" aria-atomic="true" role="status"></div>
+
+      <main id="main" class="slides" data-slide-count="10" role="region" aria-label="Slide deck">
         <section class="slide is-active">
           <span class="slide__accent">1 of 10</span>
           <h1 class="slide__title">GPT-5.3-Codex Unveiled</h1>
@@ -121,8 +125,8 @@
       <footer class="deck__footer">
         <div class="deck__progress" aria-hidden="true"><span></span></div>
         <div class="deck__controls">
-          <button class="deck__button" data-action="prev">Previous</button>
-          <button class="deck__button" data-action="next">Next</button>
+          <button class="deck__button" data-action="prev" aria-label="Previous slide">Previous</button>
+          <button class="deck__button" data-action="next" aria-label="Next slide">Next</button>
         </div>
       </footer>
     </div>

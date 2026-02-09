@@ -14,7 +14,14 @@ Rules:
 - Do not add slide eyebrow labels (no Week/Date tags).
 - Include a visible link back to index.html in the deck header.
 - Source links open in a new tab with rel="noopener".
-- Preserve ArrowLeft/ArrowRight/PageUp/PageDown navigation.
+- Support ArrowLeft/ArrowRight/PageUp/PageDown/Home/End navigation.
+- Support touch/swipe gestures for mobile.
+- Implement URL hash navigation (#1, #2, etc.) for deep linking.
 - Use semantic HTML with ordered headings and descriptive labels.
 - No inline styles or inline event handlers.
 - All styling in styles.css; all logic in the monthly script.js.
+- Add skip link and ARIA live region for screen readers.
+- Buttons must have descriptive aria-labels.
+- Include font-display=swap and meta description.
+- Support prefers-reduced-motion and :focus-visible.
+- Touch targets minimum 44px height.
