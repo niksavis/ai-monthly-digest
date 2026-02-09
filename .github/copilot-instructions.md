@@ -14,7 +14,12 @@
 ## Slides
 
 - Each deck = 10 slides exactly.
-- Each slide = 1 headline + 1-2 sentences.
+- Each slide = 1 headline + 2-3 sentences.
+- Each slide includes exactly 1 image and a visible credit with original URL + author/host.
+- Emphasize 2-4 key phrases per slide using <strong> only.
+- No eyebrow labels (no Week/Date tags).
+- Provide a visible link back to index.html on each deck.
+- Source links open in a new tab with rel="noopener".
 - Navigation keys: ArrowLeft/ArrowRight/PageUp/PageDown must work.
 
 ## HTML
@@ -28,6 +33,7 @@
 - All styles in styles.css; use CSS variables for theme tokens.
 - Keep selectors and names consistent; no unused rules.
 - Avoid non-standard, deprecated, or prefixed features.
+- Deck layout: two-column on desktop, stacked on mobile.
 
 ## JS
 
