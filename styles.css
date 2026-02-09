@@ -146,14 +146,17 @@ body {
 
 .slide {
   position: absolute;
-  inset: 0;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: min(1200px, 100%);
   padding: clamp(24px, 5vw, 56px);
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 22px;
   opacity: 0;
-  transform: translateX(60px);
+  transform: translateX(-50%) translateX(60px);
   pointer-events: none;
   transition:
     opacity 0.4s ease,
@@ -162,7 +165,7 @@ body {
 
 .slide.is-active {
   opacity: 1;
-  transform: translateX(0);
+  transform: translateX(-50%);
   pointer-events: auto;
 }
 
@@ -314,6 +317,10 @@ body {
 
 @media (min-width: 900px) {
   .slide {
+    width: min(1320px, 100%);
+  }
+
+  .slide {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 0.95fr);
     grid-template-rows: auto auto auto 1fr;
@@ -334,6 +341,6 @@ body {
     grid-column: 2;
     grid-row: 2 / span 2;
     align-self: center;
-    width: min(640px, 100%);
+    width: min(704px, 100%);
   }
 }
