@@ -10,6 +10,7 @@ Rules:
 - HTML: semantic elements only; headings strictly ordered; labels descriptive; no inline handlers/styles.
 - HTML: skip link for keyboard users; ARIA live region for announcements; descriptive aria-labels on buttons.
 - HTML: font-display=swap; meta description; images with loading="lazy".
+- HTML: all markup must pass djLint (`profile: html`); only H006 and H031 are ignored — all other rules must be satisfied.
 - CSS: styles.css only; variables for tokens; no unused selectors; no deprecated/prefixed features.
 - CSS: :focus-visible with clear outlines; prefers-reduced-motion support; touch targets minimum 44px.
 - JS: addEventListener only; no inline handlers; batch DOM writes; handle missing nodes.

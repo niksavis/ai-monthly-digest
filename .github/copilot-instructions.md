@@ -34,6 +34,7 @@
 - Buttons must have descriptive aria-labels.
 - Add font-display=swap to web fonts.
 - Include meta description for each deck.
+- All markup must pass djLint (`profile: html`); only H006 and H031 are ignored — all other rules must be satisfied.
 
 ## CSS
 
