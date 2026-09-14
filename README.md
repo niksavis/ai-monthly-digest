@@ -93,6 +93,8 @@ Pushing to `main` triggers .github/workflows/deploy.yml, which publishes the rep
 
 ## Agent Files
 
-- .github/copilot-instructions.md: core agent rules
+- AGENTS.md: authoritative working agreement for coding agents (start here)
+- CLAUDE.md: Claude Code operational notes
+- .github/copilot-instructions.md: markup rules for Copilot
 - .github/agents/slide-deck.agent.md: specialized deck editor agent
 - .github/skills/web-presentation/SKILL.md: reusable presentation skill

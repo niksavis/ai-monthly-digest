@@ -1,5 +1,10 @@
 # AI Monthly Digest: Agent Rules
 
+> **`AGENTS.md` in the repo root is the authoritative working agreement.** It covers the
+> monthly build workflow, sourcing and verification rules, the djLint checks, and publishing.
+> The rules below are the markup subset, kept here for Copilot. If the two disagree,
+> `AGENTS.md` wins — update it there.
+
 ## Project
 
 - Static site; runs in any modern browser; no build step.
@@ -16,9 +21,11 @@
 - Each deck = 10 slides exactly.
 - Each slide = 1 headline + 2-3 sentences.
 - Each slide includes exactly 1 image and a visible credit with original URL + author/host.
-- Emphasize 2-4 key phrases per slide using <strong> only.
+- Emphasize 2-4 key phrases per slide using `<strong>` only.
 - No eyebrow labels (no Week/Date tags).
 - Provide a visible link back to index.html on each deck.
+- Slides run in chronological order; use American English.
+- Verify every claim against a primary source and confirm the date falls in the digest month (see AGENTS.md).
 - Source links open in a new tab with rel="noopener".
 - Navigation keys: ArrowLeft/ArrowRight/PageUp/PageDown/Home/End must work.
 - Touch/swipe navigation must work on mobile devices.
@@ -31,7 +38,7 @@
 - No inline styles; no inline event handlers.
 - Include skip link for keyboard users.
 - Add ARIA live region for slide announcements.
-- Buttons must have descriptive aria-labels.
+- Buttons must have descriptive aria-labels and an explicit type attribute.
 - Add font-display=swap to web fonts.
 - Include meta description for each deck.
 - All markup must pass djLint (`profile: html`); only H006 and H031 are ignored — all other rules must be satisfied.

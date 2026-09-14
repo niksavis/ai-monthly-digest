@@ -5,6 +5,9 @@ description: "HTML/CSS/JS rules for the static slide deck project."
 
 # Web Presentation Skill
 
+AGENTS.md in the repo root is the authoritative working agreement; this skill is the
+HTML/CSS/JS subset.
+
 Rules:
 
 - HTML: semantic elements only; headings strictly ordered; labels descriptive; no inline handlers/styles.
