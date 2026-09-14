@@ -108,6 +108,11 @@ curl -s -o /dev/null -w '%{http_code}' -L -A 'Mozilla/5.0' "$URL"
 Finally re-check the deck against the content rules: 10 slides, 2–3 sentences each, 2–4
 `<strong>` each, 10 images with alt text and credits.
 
+`.github/workflows/checks.yml` enforces all of the above on every push and pull request —
+instruction-file alignment, identical deck scripts, both djLint passes, and the content rules.
+It does **not** check external URLs (rate limits and bot blocks make that too flaky for CI), so
+link verification stays a manual step before publishing.
+
 ## Environment notes
 
 - **Run `git fetch` before reporting that a month is missing.** Months are pushed from more

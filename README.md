@@ -40,6 +40,9 @@ djlint --check index.html months/*/index.html
 
 Both commands must report zero errors and zero files to update.
 
+`.github/workflows/checks.yml` runs these plus instruction-file alignment, deck script
+consistency, and the content rules on every push and pull request.
+
 Before publishing a deck, confirm every image and source URL still resolves — external images are hotlinked, so a dead URL leaves a broken slide.
 
 ## Deploy

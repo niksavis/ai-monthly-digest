@@ -1,0 +1,111 @@
+name: Checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Instruction files are byte-identical
+        run: |
+          cmp AGENTS.md CLAUDE.md
+          cmp AGENTS.md .github/copilot-instructions.md
+          echo "instruction files aligned"
+
+      - name: Deck scripts are byte-identical
+        run: |
+          count=$(md5sum months/*/script.js | awk '{print $1}' | sort -u | wc -l)
+          if [ "$count" -ne 1 ]; then
+            echo "::error::months/*/script.js have diverged ($count distinct versions)"
+            md5sum months/*/script.js
+            exit 1
+          fi
+          echo "deck scripts identical"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install djLint
+        run: pip install --quiet djlint==1.46.1
+
+      - name: djLint rules
+        run: djlint index.html months/*/index.html
+
+      - name: djLint formatting
+        run: djlint --check index.html months/*/index.html
+
+      - name: Deck content rules
+        run: |
+          python - <<'PY'
+          import re, sys, pathlib
+
+          failures = []
+          decks = sorted(pathlib.Path("months").glob("*/index.html"))
+          if not decks:
+              sys.exit("no decks found")
+
+          for deck in decks:
+              name = deck.parent.name
+              html = deck.read_text()
+
+              def fail(msg):
+                  failures.append(f"{name}: {msg}")
+
+              slides = re.findall(r'<section class="slide[^"]*">(.*?)</section>', html, re.S)
+              if len(slides) != 10:
+                  fail(f"{len(slides)} slides, expected 10")
+              if html.count("slide is-active") != 1:
+                  fail("expected exactly one is-active slide")
+
+              imgs = re.findall(r"<img\s([^>]*?)/>", html, re.S)
+              if len(imgs) != 10:
+                  fail(f"{len(imgs)} images, expected 10")
+              for i, img in enumerate(imgs, 1):
+                  if 'alt="' not in img or 'alt=""' in img:
+                      fail(f"image {i} missing alt text")
+                  if 'loading="lazy"' not in img:
+                      fail(f"image {i} missing loading=lazy")
+
+              if len(re.findall(r'class="slide__credit"', html)) != 10:
+                  fail("expected 10 image credits")
+
+              for i, body in enumerate(
+                  re.findall(r'<p class="slide__body">(.*?)</p>', html, re.S), 1
+              ):
+                  strong = len(re.findall(r"<strong>", body))
+                  if not 2 <= strong <= 4:
+                      fail(f"slide {i} has {strong} <strong> (need 2-4)")
+                  text = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", body)).strip()
+                  # mask quoted spans so punctuation inside a quote is not a boundary
+                  masked = re.sub(r'"[^"]*"|“[^”]*”', '"Q"', text)
+                  sentences = [
+                      s for s in re.split(r'(?<=[.!?])\s+(?=[A-Z"“])', masked) if s.strip()
+                  ]
+                  if not 2 <= len(sentences) <= 3:
+                      fail(f"slide {i} has {len(sentences)} sentences (need 2-3)")
+
+              for attr in ('target="_blank"', 'rel="noopener"'):
+                  if attr not in html:
+                      fail(f"no external link uses {attr}")
+              if "../../index.html" not in html:
+                  fail("missing All digests link back to index.html")
+
+          if failures:
+              print("::error::deck content rule violations")
+              for f in failures:
+                  print(f"  {f}")
+              sys.exit(1)
+          print(f"content rules OK across {len(decks)} decks")
+          PY
