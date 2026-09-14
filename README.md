@@ -24,7 +24,9 @@ No build step and no package manager: the site is served exactly as it appears i
 3. Update the deck title, the meta description, and the `<h1>` for the new month.
 4. Replace the 10 slide headlines, descriptions, images, and credits.
 5. Update source links to article pages.
-6. Run the checks below before committing.
+6. Run the checks below before committing, including the claim-to-source audit:
+   re-read each slide against the article it links to and cut anything that source
+   does not support.
 
 ## Checks
 

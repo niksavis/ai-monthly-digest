@@ -38,11 +38,22 @@ files.
 
 This is where the work actually goes wrong. Treat every claim as unverified until it isn't.
 
+- **Every claim on a slide must be supported by the source that slide links to** — not by
+  something else you read along the way. If a detail comes from elsewhere, either cite that
+  source instead or cut the detail. Blending one fetched article with half-remembered search
+  summaries is how a slide ends up asserting things its own citation does not contain. This is
+  the most common defect found in review, and it is invisible until someone clicks through.
+- **Prefer a source you can actually retrieve.** If the outlet blocks you, you cannot check
+  what it says, so do not cite it — find one you can read.
+- **Check attribution, not just facts.** Who said, published, or proposed something is as easy
+  to get wrong as a number and much harder to spot later.
+- **Tie every figure to its moment.** A peak and a close, a projection and a result, a quarter
+  and a run rate are different numbers; never let one stand in for another.
 - **Aggregators and SEO roundups are leads, not sources.** Follow them to a primary source (the
   lab's own post, the filing, the press release) or a reputable outlet, and cite that.
-- **Confirm the event date falls inside the digest month.** The most common failure is a story
-  that is months old, or a projection recycled as news. Check the event date, not the
-  article's publication date.
+- **Confirm the event date falls inside the digest month.** Watch for a story that is months
+  old, or a projection recycled as news. Check the event date, not the article's publication
+  date.
 - **Distinguish a projection from a confirmed result.** "On track for" and "reported" are
   different slides.
 - **Carry the qualifier.** If a figure is "adjusted", "annualized", or from internal documents
@@ -105,14 +116,26 @@ URL is a broken slide:
 curl -s -o /dev/null -w '%{http_code}' -L -A 'Mozilla/5.0' "$URL"
 ```
 
-Finally re-check the deck against the content rules: 10 slides, 2–3 sentences each, 2–4
+Then re-check the deck against the content rules: 10 slides, 2–3 sentences each, 2–4
 `<strong>` each, 10 images with alt text and credits.
 
-`.github/workflows/checks.yml` enforces all of the above — instruction-file alignment,
+### Claim-to-source audit — required, and not automatable
+
+Finally, take each slide one at a time and re-read the article it links to. For every factual
+claim on that slide — number, date, quote, name, attribution — confirm it appears in that
+source. Cut or re-source anything that does not.
+
+Nothing automated can do this. djLint validates markup, the content check counts sentences and
+tags, and the URL check only proves a link resolves — none of them read. Do this **after the
+deck is written**, not only while researching: the defect appears during writing, when
+material from several sources gets compressed into three sentences carrying one citation.
+
+`.github/workflows/checks.yml` enforces the mechanical checks — instruction-file alignment,
 identical deck scripts, both djLint passes, and the content rules. It runs on every pull
 request, and `deploy.yml` calls it as a required gate, so **a push that fails checks does not
-reach the live site.** It does **not** check external URLs (rate limits and bot blocks make
-that too flaky for CI), so link verification stays a manual step before publishing.
+reach the live site.** It does **not** check external URLs (rate limits and bot
+blocks make that too flaky for CI) and it cannot check whether a slide matches its source, so
+link verification and the claim-to-source audit both stay manual steps before publishing.
 
 ## Environment notes
 
