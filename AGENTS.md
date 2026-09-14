@@ -108,10 +108,11 @@ curl -s -o /dev/null -w '%{http_code}' -L -A 'Mozilla/5.0' "$URL"
 Finally re-check the deck against the content rules: 10 slides, 2–3 sentences each, 2–4
 `<strong>` each, 10 images with alt text and credits.
 
-`.github/workflows/checks.yml` enforces all of the above on every push and pull request —
-instruction-file alignment, identical deck scripts, both djLint passes, and the content rules.
-It does **not** check external URLs (rate limits and bot blocks make that too flaky for CI), so
-link verification stays a manual step before publishing.
+`.github/workflows/checks.yml` enforces all of the above — instruction-file alignment,
+identical deck scripts, both djLint passes, and the content rules. It runs on every pull
+request, and `deploy.yml` calls it as a required gate, so **a push that fails checks does not
+reach the live site.** It does **not** check external URLs (rate limits and bot blocks make
+that too flaky for CI), so link verification stays a manual step before publishing.
 
 ## Environment notes
 
@@ -135,6 +136,7 @@ Stay inside `months/YYYY-MM/` plus `index.html` when adding a month. Changing `s
 
 ## Publishing
 
-Pushing to `main` triggers `.github/workflows/deploy.yml`, which publishes the repo root to
-GitHub Pages. "Publish" means commit and push; confirm the workflow succeeded and the new
-pages return 200.
+Pushing to `main` triggers `.github/workflows/deploy.yml`, which runs the checks first and
+publishes the repo root to GitHub Pages only if they pass. If checks fail the deploy is
+skipped and the live site stays on the last good commit. "Publish" means commit and push;
+confirm both workflows succeeded and the new pages return 200.

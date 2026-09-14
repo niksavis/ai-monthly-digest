@@ -41,13 +41,14 @@ djlint --check index.html months/*/index.html
 Both commands must report zero errors and zero files to update.
 
 `.github/workflows/checks.yml` runs these plus instruction-file alignment, deck script
-consistency, and the content rules on every push and pull request.
+consistency, and the content rules. It runs on every pull request, and the deploy workflow
+requires it to pass before publishing.
 
 Before publishing a deck, confirm every image and source URL still resolves — external images are hotlinked, so a dead URL leaves a broken slide.
 
 ## Deploy
 
-Pushing to `main` triggers .github/workflows/deploy.yml, which publishes the repository root to GitHub Pages. There is nothing to build; the deployed site is the committed files.
+Pushing to `main` triggers .github/workflows/deploy.yml, which runs the checks and then publishes the repository root to GitHub Pages. A push that fails checks is not deployed. There is nothing to build; the deployed site is the committed files.
 
 ## Features
 
