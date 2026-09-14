@@ -2,23 +2,49 @@
 
 A static, accessible slide deck collection with one 10-slide deck per month. Each deck showcases AI news and trends with images, credits, and presentation-ready formatting.
 
+Live site: <https://niksavis.github.io/ai-monthly-digest/>
+
 ## Structure
 
 - index.html: landing page
 - styles.css: shared styles
 - months/YYYY-MM/index.html: monthly deck
-- months/YYYY-MM/script.js: monthly deck behavior
+- months/YYYY-MM/script.js: monthly deck behavior (identical in every month; copied rather than shared)
 
 ## Usage
 
 Open index.html in a modern browser and select a month. Navigate with keyboard, touch gestures, or buttons. Share specific slides using URL hashes (#1, #2, etc.).
 
+No build step and no package manager: the site is served exactly as it appears in the repository.
+
 ## Add a Month
 
-1. Copy months/2026-01 to months/YYYY-MM.
-2. Update index.html with a new card link.
-3. Replace the 10 slide headlines, descriptions, images, and credits.
-4. Update source links to article pages.
+1. Copy the most recent month (for example months/2026-09) to months/YYYY-MM. Always copy the newest deck, not the oldest, so you inherit the current markup and script.
+2. Add a card link to index.html and update the `Latest: <Month> <Year>` line in the header.
+3. Update the deck title, the meta description, and the `<h1>` for the new month.
+4. Replace the 10 slide headlines, descriptions, images, and credits.
+5. Update source links to article pages.
+6. Run the checks below before committing.
+
+## Checks
+
+All markup must pass djLint using the committed .djlintrc (`profile: html`, ignoring only H006 and H031). Every other rule must be satisfied.
+
+```sh
+# lint rules
+djlint index.html months/*/index.html
+
+# formatting (use --reformat to apply)
+djlint --check index.html months/*/index.html
+```
+
+Both commands must report zero errors and zero files to update.
+
+Before publishing a deck, confirm every image and source URL still resolves — external images are hotlinked, so a dead URL leaves a broken slide.
+
+## Deploy
+
+Pushing to `main` triggers .github/workflows/deploy.yml, which publishes the repository root to GitHub Pages. There is nothing to build; the deployed site is the committed files.
 
 ## Features
 
@@ -26,7 +52,7 @@ Open index.html in a modern browser and select a month. Navigate with keyboard, 
 
 - Arrow keys (Left/Right), Page Up/Down, Home/End
 - Touch/swipe gestures on mobile
-- URL hash navigation for deep linking (#1, #2, etc.)
+- URL hash navigation for deep linking (#1, #2, etc.), including response to hash changes
 - Previous/Next buttons
 
 **Accessibility:**
@@ -60,9 +86,10 @@ Open index.html in a modern browser and select a month. Navigate with keyboard, 
 - Semantic HTML only; no inline styles or handlers.
 - All styling in styles.css with CSS variables.
 - All logic in monthly script.js with addEventListener.
+- Buttons declare an explicit type attribute.
 - Font-display=swap for web fonts.
 - Meta description for each deck.
-- Images with loading="lazy".
+- Images with loading="lazy" and descriptive alt text.
 
 ## Agent Files
 

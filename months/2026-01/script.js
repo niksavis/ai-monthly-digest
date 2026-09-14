@@ -3,94 +3,157 @@ const prevButton = document.querySelector("[data-action='prev']");
 const nextButton = document.querySelector("[data-action='next']");
 const progressBar = document.querySelector(".deck__progress span");
 const liveRegion = document.querySelector(".deck__live");
+const slidesContainer = document.querySelector(".slides");
 
 let currentIndex = 0;
-let touchStartX = 0;
-let touchEndX = 0;
+let touchStartX = null;
+
+const clampIndex = (index) => {
+  return Math.max(0, Math.min(slides.length - 1, index));
+};
+
+const parseHashIndex = () => {
+  const hash = window.location.hash.slice(1);
+  const slideNumber = Number.parseInt(hash, 10);
+
+  if (Number.isNaN(slideNumber)) return null;
+
+  const index = slideNumber - 1;
+  if (index < 0 || index >= slides.length) return null;
+
+  return index;
+};
+
+const setHash = () => {
+  window.history.replaceState(null, "", `#${currentIndex + 1}`);
+};
 
 const updateUI = () => {
   slides.forEach((slide, index) => {
     slide.classList.toggle("is-active", index === currentIndex);
   });
 
-  const progress = ((currentIndex + 1) / slides.length) * 100;
-  progressBar.style.width = `${progress}%`;
+  if (progressBar) {
+    const progress = ((currentIndex + 1) / slides.length) * 100;
+    progressBar.style.width = `${progress}%`;
+  }
 
-  prevButton.disabled = currentIndex === 0;
-  nextButton.disabled = currentIndex === slides.length - 1;
+  if (prevButton) {
+    prevButton.disabled = currentIndex === 0;
+  }
 
-  // Update URL hash
-  window.history.replaceState(null, "", `#${currentIndex + 1}`);
+  if (nextButton) {
+    nextButton.disabled = currentIndex === slides.length - 1;
+  }
 
-  // Announce slide change to screen readers
   if (liveRegion) {
-    const slideTitle =
-      slides[currentIndex]?.querySelector(".slide__title")?.textContent;
-    liveRegion.textContent = `Slide ${currentIndex + 1} of ${slides.length}: ${slideTitle}`;
+    const title =
+      slides[currentIndex]?.querySelector(".slide__title")?.textContent ||
+      `Slide ${currentIndex + 1}`;
+    liveRegion.textContent = `Slide ${currentIndex + 1} of ${slides.length}: ${title}`;
   }
 };
 
-const goToSlide = (index) => {
-  const nextIndex = Math.max(0, Math.min(slides.length - 1, index));
-  if (nextIndex === currentIndex) return;
+const goToSlide = (index, options = {}) => {
+  const updateHash = options.updateHash !== false;
+  const nextIndex = clampIndex(index);
+
+  if (nextIndex === currentIndex) {
+    if (updateHash) {
+      setHash();
+    }
+    return;
+  }
+
   currentIndex = nextIndex;
   updateUI();
-};
 
-// Initialize from URL hash
-const initFromHash = () => {
-  const hash = window.location.hash.slice(1);
-  const slideNum = parseInt(hash, 10);
-  if (slideNum >= 1 && slideNum <= slides.length) {
-    currentIndex = slideNum - 1;
+  if (updateHash) {
+    setHash();
   }
 };
 
-// Button navigation
-prevButton?.addEventListener("click", () => goToSlide(currentIndex - 1));
-nextButton?.addEventListener("click", () => goToSlide(currentIndex + 1));
-
-// Keyboard navigation
-document.addEventListener("keydown", (event) => {
+const handleKeydown = (event) => {
   if (event.key === "ArrowRight" || event.key === "PageDown") {
+    event.preventDefault();
     goToSlide(currentIndex + 1);
+    return;
   }
+
   if (event.key === "ArrowLeft" || event.key === "PageUp") {
+    event.preventDefault();
     goToSlide(currentIndex - 1);
+    return;
   }
+
   if (event.key === "Home") {
+    event.preventDefault();
     goToSlide(0);
+    return;
   }
+
   if (event.key === "End") {
+    event.preventDefault();
     goToSlide(slides.length - 1);
   }
-});
+};
 
-// Touch/swipe navigation
-const slidesContainer = document.querySelector(".slides");
-if (slidesContainer) {
-  slidesContainer.addEventListener("touchstart", (event) => {
-    touchStartX = event.changedTouches[0].screenX;
-  });
+const handleHashChange = () => {
+  const hashIndex = parseHashIndex();
+  if (hashIndex === null) return;
+  goToSlide(hashIndex, { updateHash: false });
+};
 
-  slidesContainer.addEventListener("touchend", (event) => {
-    touchEndX = event.changedTouches[0].screenX;
-    handleSwipe();
-  });
-}
+const handleTouchStart = (event) => {
+  if (!event.changedTouches || !event.changedTouches.length) return;
+  touchStartX = event.changedTouches[0].screenX;
+};
 
-const handleSwipe = () => {
-  const swipeThreshold = 50;
-  const diff = touchStartX - touchEndX;
+const handleTouchEnd = (event) => {
+  if (touchStartX === null) return;
+  if (!event.changedTouches || !event.changedTouches.length) return;
 
-  if (Math.abs(diff) > swipeThreshold) {
-    if (diff > 0) {
-      goToSlide(currentIndex + 1);
-    } else {
-      goToSlide(currentIndex - 1);
-    }
+  const touchEndX = event.changedTouches[0].screenX;
+  const difference = touchStartX - touchEndX;
+  touchStartX = null;
+
+  if (Math.abs(difference) < 50) return;
+
+  if (difference > 0) {
+    goToSlide(currentIndex + 1);
+  } else {
+    goToSlide(currentIndex - 1);
   }
 };
 
-initFromHash();
-updateUI();
+if (slides.length > 0) {
+  const hashIndex = parseHashIndex();
+  currentIndex = hashIndex === null ? 0 : hashIndex;
+
+  if (prevButton) {
+    prevButton.addEventListener("click", () => {
+      goToSlide(currentIndex - 1);
+    });
+  }
+
+  if (nextButton) {
+    nextButton.addEventListener("click", () => {
+      goToSlide(currentIndex + 1);
+    });
+  }
+
+  document.addEventListener("keydown", handleKeydown);
+  window.addEventListener("hashchange", handleHashChange);
+
+  if (slidesContainer) {
+    slidesContainer.addEventListener("touchstart", handleTouchStart, {
+      passive: true,
+    });
+    slidesContainer.addEventListener("touchend", handleTouchEnd, {
+      passive: true,
+    });
+  }
+
+  updateUI();
+  setHash();
+}
