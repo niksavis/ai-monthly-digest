@@ -1,69 +1,135 @@
-# AI Monthly Digest: Agent Rules
+# AI Monthly Digest — Agent Instructions
 
-> **`AGENTS.md` in the repo root is the authoritative working agreement.** It covers the
-> monthly build workflow, sourcing and verification rules, the djLint checks, and publishing.
-> The rules below are the markup subset, kept here for Copilot. If the two disagree,
-> `AGENTS.md` wins — update it there.
+Canonical instructions for any coding agent working in this repo.
 
-## Project
+**This file is maintained as three byte-identical copies:** `AGENTS.md`, `CLAUDE.md`, and
+`.github/copilot-instructions.md`. Each tool auto-loads a different one, so each must be
+complete on its own. **Edit all three together or they will drift.** Verify with:
 
-- Static site; runs in any modern browser; no build step.
-- External libraries: CDN only.
+```sh
+cmp AGENTS.md CLAUDE.md && cmp AGENTS.md .github/copilot-instructions.md && echo aligned
+```
 
-## Structure
+## What this repo is
 
-- Landing: index.html
-- Shared styles: styles.css
-- Month deck: months/YYYY-MM/index.html + months/YYYY-MM/script.js
+A static site published to GitHub Pages: one 10-slide deck per month covering that month's AI
+news. No build step, no package manager, no dependencies. The deployed site is the committed
+files.
 
-## Slides
+- `index.html` — landing page (cards + `Latest: <Month> <Year>` line)
+- `styles.css` — all styling, shared by every deck
+- `months/YYYY-MM/index.html` — one month's deck
+- `months/YYYY-MM/script.js` — deck behavior; **identical in every month**, copied not shared
 
-- Each deck = 10 slides exactly.
-- Each slide = 1 headline + 2-3 sentences.
-- Each slide includes exactly 1 image and a visible credit with original URL + author/host.
-- Emphasize 2-4 key phrases per slide using `<strong>` only.
+## Building a month
+
+1. **Research** the calendar month. Gather more candidates than needed and let the requester
+   choose; do not pick the ten yourself unless asked.
+2. **Verify** every story against the sourcing rules below before writing any markup.
+3. **Copy the newest existing deck** to `months/YYYY-MM/` — never the oldest. Older decks carry
+   stale markup and drift.
+4. Update the deck `<title>`, `<h1>`, and meta description.
+5. Write the ten slides.
+6. Add a card to `index.html` and update the `Latest: <Month> <Year>` line.
+7. Run the checks below.
+8. Publish.
+
+## Sourcing rules
+
+This is where the work actually goes wrong. Treat every claim as unverified until it isn't.
+
+- **Aggregators and SEO roundups are leads, not sources.** Follow them to a primary source (the
+  lab's own post, the filing, the press release) or a reputable outlet, and cite that.
+- **Confirm the event date falls inside the digest month.** The most common failure is a story
+  that is months old, or a projection recycled as news. Check the event date, not the
+  article's publication date.
+- **Distinguish a projection from a confirmed result.** "On track for" and "reported" are
+  different slides.
+- **Carry the qualifier.** If a figure is "adjusted", "annualized", or from internal documents
+  only, the slide says so.
+- **When reputable sources conflict on a number, omit the number.** Do not pick a side.
+- **State what is not yet established** — unreviewed results, unreleased models, denied
+  allegations.
+- **Never invent an image URL.** Harvest it from the article you are citing and confirm it
+  loads.
+- **Do not identify a reused stock image from existing `alt` text.** The same photo ID is
+  described differently in different decks, so that text is not evidence of what the image
+  shows.
+
+## Content rules
+
+- Exactly 10 slides per deck.
+- Each slide: 1 headline + 2–3 sentences.
+- Emphasize 2–4 key phrases per slide with `<strong>` — no more, no fewer.
+- Each slide has exactly 1 image with a visible credit: image host + author/host, plus a
+  `Source` link to the article.
+- Source links open in a new tab with `rel="noopener"`.
 - No eyebrow labels (no Week/Date tags).
-- Provide a visible link back to index.html on each deck.
-- Slides run in chronological order; use American English.
-- Verify every claim against a primary source and confirm the date falls in the digest month (see AGENTS.md).
-- Source links open in a new tab with rel="noopener".
-- Navigation keys: ArrowLeft/ArrowRight/PageUp/PageDown/Home/End must work.
-- Touch/swipe navigation must work on mobile devices.
-- URL hash navigation: slides must be linkable via #1, #2, etc.
+- Every deck links back to `index.html` ("All digests") in its header.
+- Slides run in chronological order within the month.
+- American English (`behavior`, `program`, `license`, `modeled`).
 
-## HTML
+## Markup, styling, behavior
 
-- Use native semantic elements; do not replace with ARIA.
-- Headings strictly ordered; labels descriptive.
-- No inline styles; no inline event handlers.
-- Include skip link for keyboard users.
-- Add ARIA live region for slide announcements.
-- Buttons must have descriptive aria-labels and an explicit type attribute.
-- Add font-display=swap to web fonts.
-- Include meta description for each deck.
-- All markup must pass djLint (`profile: html`); only H006 and H031 are ignored — all other rules must be satisfied.
+- Semantic HTML with ordered headings; use native elements rather than replacing them with
+  ARIA. No inline styles or inline event handlers.
+- Buttons declare an explicit `type` and a descriptive `aria-label`.
+- Images carry descriptive `alt` text and `loading="lazy"`.
+- Each deck includes a skip link, an ARIA live region updated on slide change, and a meta
+  description.
+- Web fonts are CDN-hosted with `font-display=swap`. External libraries: CDN only. No build
+  tooling or package managers.
+- All styling in `styles.css` using CSS variables. Consistent selector names, no unused rules,
+  no deprecated or prefixed features. `:focus-visible` outlines, `prefers-reduced-motion`
+  support, 44px minimum touch targets. Two-column on desktop, stacked on mobile.
+- All logic in the monthly `script.js` via `addEventListener`, with null checks on every DOM
+  query and batched DOM writes. No deprecated or non-standard APIs. Keyboard
+  (Arrow/PageUp/PageDown/Home/End), touch/swipe, and `#N` hash navigation including
+  `hashchange` must all work, and keyboard navigation must stay intact.
+- If `script.js` changes, apply it to **every** month so the copies stay identical.
 
-## CSS
+## Checks
 
-- All styles in styles.css; use CSS variables for theme tokens.
-- Keep selectors and names consistent; no unused rules.
-- Avoid non-standard, deprecated, or prefixed features.
-- Deck layout: two-column on desktop, stacked on mobile.
-- Include :focus-visible styles with clear outlines.
-- Support prefers-reduced-motion for accessibility.
-- Touch targets minimum 44px height.
+All markup must pass djLint with the committed `.djlintrc` (`profile: html`, ignoring only
+H006 and H031). Every other rule must be satisfied.
 
-## JS
+```sh
+djlint index.html months/*/index.html                 # rules — must report 0 errors
+djlint --check index.html months/*/index.html         # format — must report 0 files to update
+```
 
-- Unobtrusive only: addEventListener; no inline handlers.
-- Minimize DOM writes; batch updates.
-- Avoid deprecated or non-standard APIs.
-- Support touch/swipe gestures for navigation.
-- Implement URL hash navigation for deep linking.
-- Update ARIA live region on slide changes.
-- Include null checks for all DOM queries.
+Then confirm **every image and source URL resolves**. External images are hotlinked, so a dead
+URL is a broken slide:
 
-## Assets
+```sh
+curl -s -o /dev/null -w '%{http_code}' -L -A 'Mozilla/5.0' "$URL"
+```
 
-- Fonts: web-safe or CDN-hosted only.
-- No build tooling or package managers.
+Finally re-check the deck against the content rules: 10 slides, 2–3 sentences each, 2–4
+`<strong>` each, 10 images with alt text and credits.
+
+## Environment notes
+
+- **Run `git fetch` before reporting that a month is missing.** Months are pushed from more
+  than one machine; a stale clone will make you report a gap that does not exist. Check
+  `origin/main`, not just the working tree.
+- **djLint is usually not installed**, and system Python may be externally managed (PEP 668).
+  Use a throwaway virtualenv rather than fighting `pip install --user`.
+- **`djlint --reformat` rewrites whitespace across a whole file.** Afterward, prove nothing
+  semantic changed — parse before/after and diff the rendered text plus every element
+  attribute. Do not eyeball a 300-line diff.
+- **Automated page fetchers are blocked (403) by outlets that serve readers fine** — Axios,
+  CNBC, the Washington Post, `senate.gov`, TechXplore. So: choose a `Source` link you could
+  actually retrieve and verify, and never conclude a URL is dead because a fetch tool failed.
+  Confirm link health with `curl -L -A 'Mozilla/5.0'`.
+
+## Scope
+
+Stay inside `months/YYYY-MM/` plus `index.html` when adding a month. Changing `styles.css` or
+`script.js` affects every deck — if you do, say so explicitly.
+
+## Publishing
+
+Pushing to `main` triggers `.github/workflows/deploy.yml`, which publishes the repo root to
+GitHub Pages. "Publish" means commit and push; confirm the workflow succeeded and the new
+pages return 200.

@@ -93,8 +93,15 @@ Pushing to `main` triggers .github/workflows/deploy.yml, which publishes the rep
 
 ## Agent Files
 
-- AGENTS.md: authoritative working agreement for coding agents (start here)
-- CLAUDE.md: Claude Code operational notes
-- .github/copilot-instructions.md: markup rules for Copilot
-- .github/agents/slide-deck.agent.md: specialized deck editor agent
-- .github/skills/web-presentation/SKILL.md: reusable presentation skill
+Agent instructions live in three **byte-identical** copies, because each tool auto-loads a
+different filename and each copy must be complete on its own:
+
+- AGENTS.md — read by Codex and most coding agents
+- CLAUDE.md — read by Claude Code
+- .github/copilot-instructions.md — read by GitHub Copilot
+
+Edit all three together. Verify alignment with:
+
+```sh
+cmp AGENTS.md CLAUDE.md && cmp AGENTS.md .github/copilot-instructions.md && echo aligned
+```

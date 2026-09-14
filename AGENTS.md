@@ -1,8 +1,14 @@
-# AI Monthly Digest — Working Agreement
+# AI Monthly Digest — Agent Instructions
 
-Canonical instructions for any coding agent working in this repo. Tool-specific files
-(`CLAUDE.md`, `.github/copilot-instructions.md`) defer to this document; keep rules here and
-reference them from there rather than restating them.
+Canonical instructions for any coding agent working in this repo.
+
+**This file is maintained as three byte-identical copies:** `AGENTS.md`, `CLAUDE.md`, and
+`.github/copilot-instructions.md`. Each tool auto-loads a different one, so each must be
+complete on its own. **Edit all three together or they will drift.** Verify with:
+
+```sh
+cmp AGENTS.md CLAUDE.md && cmp AGENTS.md .github/copilot-instructions.md && echo aligned
+```
 
 ## What this repo is
 
@@ -19,7 +25,7 @@ files.
 
 1. **Research** the calendar month. Gather more candidates than needed and let the requester
    choose; do not pick the ten yourself unless asked.
-2. **Verify** every story against the sourcing rules below before writing a word of markup.
+2. **Verify** every story against the sourcing rules below before writing any markup.
 3. **Copy the newest existing deck** to `months/YYYY-MM/` — never the oldest. Older decks carry
    stale markup and drift.
 4. Update the deck `<title>`, `<h1>`, and meta description.
@@ -34,18 +40,21 @@ This is where the work actually goes wrong. Treat every claim as unverified unti
 
 - **Aggregators and SEO roundups are leads, not sources.** Follow them to a primary source (the
   lab's own post, the filing, the press release) or a reputable outlet, and cite that.
-- **Confirm the date falls inside the digest month.** The most common failure is a story that
-  is months old, or a projection being recycled as news. Check the event date, not the
+- **Confirm the event date falls inside the digest month.** The most common failure is a story
+  that is months old, or a projection recycled as news. Check the event date, not the
   article's publication date.
 - **Distinguish a projection from a confirmed result.** "On track for" and "reported" are
   different slides.
-- **Carry the qualifier.** If a figure is "adjusted", "annualized", or internal-documents-only,
-  the slide says so.
+- **Carry the qualifier.** If a figure is "adjusted", "annualized", or from internal documents
+  only, the slide says so.
 - **When reputable sources conflict on a number, omit the number.** Do not pick a side.
 - **State what is not yet established** — unreviewed results, unreleased models, denied
   allegations.
 - **Never invent an image URL.** Harvest it from the article you are citing and confirm it
   loads.
+- **Do not identify a reused stock image from existing `alt` text.** The same photo ID is
+  described differently in different decks, so that text is not evidence of what the image
+  shows.
 
 ## Content rules
 
@@ -62,18 +71,22 @@ This is where the work actually goes wrong. Treat every claim as unverified unti
 
 ## Markup, styling, behavior
 
-- Semantic HTML; ordered headings; no inline styles or inline event handlers.
-- Buttons declare an explicit `type`.
+- Semantic HTML with ordered headings; use native elements rather than replacing them with
+  ARIA. No inline styles or inline event handlers.
+- Buttons declare an explicit `type` and a descriptive `aria-label`.
 - Images carry descriptive `alt` text and `loading="lazy"`.
-- Each deck includes a skip link, an ARIA live region, and descriptive `aria-label`s.
-- `font-display=swap` on web fonts; meta description on every page.
-- All styling in `styles.css` using CSS variables — no unused selectors, no deprecated or
-  prefixed features. `:focus-visible` outlines, `prefers-reduced-motion` support, 44px minimum
-  touch targets. Two-column on desktop, stacked on mobile.
+- Each deck includes a skip link, an ARIA live region updated on slide change, and a meta
+  description.
+- Web fonts are CDN-hosted with `font-display=swap`. External libraries: CDN only. No build
+  tooling or package managers.
+- All styling in `styles.css` using CSS variables. Consistent selector names, no unused rules,
+  no deprecated or prefixed features. `:focus-visible` outlines, `prefers-reduced-motion`
+  support, 44px minimum touch targets. Two-column on desktop, stacked on mobile.
 - All logic in the monthly `script.js` via `addEventListener`, with null checks on every DOM
-  query. Keyboard (Arrow/PageUp/PageDown/Home/End), touch/swipe, and `#N` hash navigation
-  including `hashchange` must all work.
-- If `script.js` changes, apply it to **every** month so the nine copies stay identical.
+  query and batched DOM writes. No deprecated or non-standard APIs. Keyboard
+  (Arrow/PageUp/PageDown/Home/End), touch/swipe, and `#N` hash navigation including
+  `hashchange` must all work, and keyboard navigation must stay intact.
+- If `script.js` changes, apply it to **every** month so the copies stay identical.
 
 ## Checks
 
@@ -94,6 +107,26 @@ curl -s -o /dev/null -w '%{http_code}' -L -A 'Mozilla/5.0' "$URL"
 
 Finally re-check the deck against the content rules: 10 slides, 2–3 sentences each, 2–4
 `<strong>` each, 10 images with alt text and credits.
+
+## Environment notes
+
+- **Run `git fetch` before reporting that a month is missing.** Months are pushed from more
+  than one machine; a stale clone will make you report a gap that does not exist. Check
+  `origin/main`, not just the working tree.
+- **djLint is usually not installed**, and system Python may be externally managed (PEP 668).
+  Use a throwaway virtualenv rather than fighting `pip install --user`.
+- **`djlint --reformat` rewrites whitespace across a whole file.** Afterward, prove nothing
+  semantic changed — parse before/after and diff the rendered text plus every element
+  attribute. Do not eyeball a 300-line diff.
+- **Automated page fetchers are blocked (403) by outlets that serve readers fine** — Axios,
+  CNBC, the Washington Post, `senate.gov`, TechXplore. So: choose a `Source` link you could
+  actually retrieve and verify, and never conclude a URL is dead because a fetch tool failed.
+  Confirm link health with `curl -L -A 'Mozilla/5.0'`.
+
+## Scope
+
+Stay inside `months/YYYY-MM/` plus `index.html` when adding a month. Changing `styles.css` or
+`script.js` affects every deck — if you do, say so explicitly.
 
 ## Publishing
 
