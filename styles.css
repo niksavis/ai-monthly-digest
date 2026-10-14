@@ -347,6 +347,13 @@ body {
   transform: none;
 }
 
+@media (max-width: 899px) {
+  .slide {
+    justify-content: flex-start;
+    overflow-y: auto;
+  }
+}
+
 @media (max-width: 720px) {
   .deck__nav,
   .deck__footer {
